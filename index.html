@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect Tonkeeper</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tonconnect/sdk@latest"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Connect Wallet Toncoin</h2>
+        <button id="connectTonkeeper">Connect Tonkeeper</button>
+        <p id="walletAddress">Wallet: Not connected</p>
+    </div>
+
+    <script>
+        async function connectWallet() {
+            const tonConnect = new TonConnect();
+
+            try {
+                // Cek apakah ekstensi tersedia
+                const wallets = await tonConnect.getWallets();
+
+                if (wallets.length > 0) {
+                    // Jika ada ekstensi, gunakan ekstensi
+                    await tonConnect.connect(wallets[0]);
+                    const connectedWallet = await tonConnect.getWallet();
+                    document.getElementById("walletAddress").innerText = "Wallet: " + connectedWallet.account.address;
+                } else {
+                    // Jika tidak ada ekstensi, buka aplikasi Tonkeeper
+                    const tonkeeperUrl = "https://app.tonkeeper.com/ton-connect";
+                    window.location.href = tonkeeperUrl;
+                }
+            } catch (error) {
+                console.error("Gagal menghubungkan ke Tonkeeper:", error);
+                alert("Gagal menyambungkan ke wallet.");
+            }
+        }
+
+        document.getElementById("connectTonkeeper").addEventListener("click", connectWallet);
+    </script>
+</body>
+</html>
