@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connect Tonkeeper</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@tonconnect/sdk@latest"></script>
 </head>
 <body>
     <div class="container">
@@ -15,30 +14,28 @@
     </div>
 
     <script>
-        async function connectWallet() {
-            const tonConnect = new TonConnect();
-
+        document.getElementById("connectTonkeeper").addEventListener("click", async () => {
             try {
-                // Cek apakah ekstensi tersedia
-                const wallets = await tonConnect.getWallets();
-
-                if (wallets.length > 0) {
-                    // Jika ada ekstensi, gunakan ekstensi
-                    await tonConnect.connect(wallets[0]);
-                    const connectedWallet = await tonConnect.getWallet();
-                    document.getElementById("walletAddress").innerText = "Wallet: " + connectedWallet.account.address;
+                // Cek apakah ekstensi Tonkeeper tersedia di browser (PC)
+                if (window.ton) {
+                    const accounts = await window.ton.request({ method: "ton_requestAccounts" });
+                    if (accounts && accounts.length > 0) {
+                        document.getElementById("walletAddress").innerText = "Wallet: " + accounts[0];
+                        alert("Wallet connected: " + accounts[0]);
+                    } else {
+                        alert("Failed to connect Tonkeeper.");
+                    }
                 } else {
-                    // Jika tidak ada ekstensi, buka aplikasi Tonkeeper
-                    const tonkeeperUrl = "https://app.tonkeeper.com/ton-connect";
+                    // Jika tidak ada ekstensi, arahkan ke aplikasi Tonkeeper di Mobile atau PC
+                    const redirectUrl = encodeURIComponent("https://your-github-page-url/");
+                    const tonkeeperUrl = `https://app.tonkeeper.com/ton-connect?ret=${redirectUrl}`;
                     window.location.href = tonkeeperUrl;
                 }
             } catch (error) {
-                console.error("Gagal menghubungkan ke Tonkeeper:", error);
-                alert("Gagal menyambungkan ke wallet.");
+                console.error("Error connecting to Tonkeeper:", error);
+                alert("Error connecting to Tonkeeper.");
             }
-        }
-
-        document.getElementById("connectTonkeeper").addEventListener("click", connectWallet);
+        });
     </script>
 </body>
 </html>
